@@ -22,7 +22,7 @@ func cliPlay(words []string) {
 	rounds := 0
 	for {
 		fmt.Println("finding best word...")
-		bestword(sols, words, m)
+		bestword(sols, words, m, []string{})
 		fmt.Println("pick a word")
 		var pick string
 		fmt.Scanln(&pick)

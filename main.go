@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -10,6 +11,17 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
+	}
+
+	rounds := []round{
+	// {"test", 0},
+	// {"ates", 0},
+	// {"oast", 0},
+	// {"auto", 1},
+	// {"vrow", 0},
+	// {"jarl", 1},
+	// {"bind", 0},
+	// {"caph", 1},
 	}
 	// rounds := []round{
 	// 	// {"dude", 0},
@@ -34,13 +46,36 @@ func main() {
 	// 	{"ogre", 2},
 	// 	{"quiz", 0},
 	// }
-	cliPlay(words)
-	// sols := play(words, rounds...)
-	// end := bitmapToSlice(words, sols)
-	// fmt.Println(end, len(end))
-	// m := reverseIndex(words)
-	// bestword(sols, words, m)
 
-	//indexCounts(m, words)
-
+	// cliPlay(words)
+	var guess string
+	blacklist := []string{}
+	sols := playRounds(words, rounds...)
+	m := reverseIndex(words)
+	if len(rounds) > 0 {
+		guess = bestword(sols, words, m, blacklist)
+	}
+	totalRounds := 0
+	for {
+		var word string
+		var score int
+		fmt.Printf("===ROUND %d===\n", totalRounds)
+		fmt.Println("enter word")
+		fmt.Scanln(&word)
+		for word == "x" {
+			fmt.Println("removing", guess)
+			blacklist = append(blacklist, guess)
+			fmt.Println("calculating next guess...")
+			guess = bestword(sols, words, m, blacklist)
+			fmt.Println("enter word")
+			fmt.Scanln(&word)
+		}
+		fmt.Println("enter score")
+		fmt.Scanln(&score)
+		totalRounds = totalRounds + 1
+		word = strings.ToUpper(word)
+		addResult(word, score, sols, m, words)
+		fmt.Println("calculating best word...")
+		guess = bestword(sols, words, m, blacklist)
+	}
 }

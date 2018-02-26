@@ -6,15 +6,22 @@ import (
 	"strings"
 )
 
-type hyposol struct {
-	guess string
-}
-
-func bestword(sols *Bitmap, words []string, index map[string]*Bitmap) {
+func bestword(sols *Bitmap, words []string, index map[string]*Bitmap, blacklist []string) string {
 	middle := float64(len(bitmapToSlice(words, sols))) / 2
 	bestguess := ""
 	bestd := middle * 3
+	var skip bool
 	for _, guess := range words {
+		for _, b := range blacklist {
+			if b == guess {
+				skip = true
+				break
+			}
+		}
+		if skip {
+			skip = false
+			continue
+		}
 		d := float64(0)
 		for i := 0; i <= len(guess); i++ {
 			copySolMap := sols.Copy()
@@ -31,14 +38,21 @@ func bestword(sols *Bitmap, words []string, index map[string]*Bitmap) {
 			bestd = d
 		}
 	}
-	fmt.Println("best guess", bestguess, "d", bestd)
+	fmt.Printf("The best guess is %s (d=%f)\n", bestguess, bestd)
 	for i := 0; i <= len(bestguess); i++ {
 		copySolMap := sols.Copy()
 		addResult(bestguess, i, copySolMap, index, words)
 		hypospace := bitmapToSlice(words, copySolMap)
 		n := len(hypospace)
-		fmt.Println("correct", i, n)
+		if n > 0 {
+			fmt.Printf("(correct=%d) %d solutions remain\n", i, n)
+			if n < 30 && n > 0 {
+				fmt.Println("solutions:", hypospace)
+			}
+		}
+
 	}
+	return bestguess
 }
 
 func countCorrect(a, b string) int {
