@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"sort"
 	"strings"
 )
 
@@ -14,7 +13,7 @@ type hyposol struct {
 func bestword(sols *Bitmap, words []string, index map[string]*Bitmap) {
 	middle := float64(len(bitmapToSlice(words, sols))) / 2
 	bestguess := ""
-	bestd := middle
+	bestd := middle * 3
 	for _, guess := range words {
 		d := float64(0)
 		for i := 0; i <= len(guess); i++ {
@@ -38,21 +37,32 @@ func bestword(sols *Bitmap, words []string, index map[string]*Bitmap) {
 		addResult(bestguess, i, copySolMap, index, words)
 		hypospace := bitmapToSlice(words, copySolMap)
 		n := len(hypospace)
-		fmt.Println("correct", i, hypospace, n)
+		fmt.Println("correct", i, n)
 	}
 }
 
 func countCorrect(a, b string) int {
+	a = strings.ToUpper(a)
+	b = strings.ToUpper(b)
 	as := strings.Split(a, "")
 	bs := strings.Split(b, "")
 
-	sort.Strings(as)
-	sort.Strings(bs)
+	amap := map[string]int{}
+	bmap := map[string]int{}
 
+	match := 0
 	for i := 0; i < len(as); i++ {
-		if i > len(bs)-1 || as[i] != bs[i] {
-			return i
-		}
+		amap[as[i]] = amap[as[i]] + 1
 	}
-	return 0
+
+	for i := 0; i < len(bs); i++ {
+		bmap[bs[i]] = bmap[bs[i]] + 1
+	}
+
+	for k, v := range amap {
+		min := math.Min(float64(v), float64(bmap[k]))
+		match = match + int(min)
+	}
+
+	return match
 }
