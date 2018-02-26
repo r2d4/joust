@@ -36,4 +36,5 @@ func main() {
 	}
 	sols := play(words, rounds...)
 	fmt.Println(bitmapToSlice(words, sols))
+	stats(sols, words)
 }
