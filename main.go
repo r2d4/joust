@@ -35,6 +35,11 @@ func main() {
 		{"quiz", 0},
 	}
 	sols := play(words, rounds...)
-	fmt.Println(bitmapToSlice(words, sols))
-	stats(sols, words)
+	end := bitmapToSlice(words, sols)
+	fmt.Println(end, len(end))
+	m := reverseIndex(words)
+	bestword(sols, words, m)
+
+	//indexCounts(m, words)
+
 }

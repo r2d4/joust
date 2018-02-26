@@ -18,6 +18,16 @@ func NewBitmap(length int) *Bitmap {
 	}
 }
 
+func (b *Bitmap) Copy() *Bitmap {
+	retb := make([]byte, b.length)
+	copy(retb, b.b)
+
+	return &Bitmap{
+		b:      retb,
+		length: b.length,
+	}
+}
+
 func NewBitmapAllOn(length int) *Bitmap {
 	b := NewBitmap(length)
 	for i := 0; i < len(b.b); i++ {

@@ -2,35 +2,63 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 )
 
-func stats(sols *Bitmap, words []string) {
-	solWords := bitmapToSlice(words, sols)
-	m := map[string]int{}
-	for _, sol := range solWords {
-		combos := combinations(strings.Split(sol, ""), -1)
-		for _, c := range combos {
-			m[c]++
+type hyposol struct {
+	guess string
+}
+
+func bestword(sols *Bitmap, words []string, index map[string]*Bitmap) {
+	possibleSolWords := bitmapToSlice(words, sols)
+	bestelim := float64(0)
+	bestguess := ""
+	middle := len(possibleSolWords) * len(words) / 2
+	for _, guess := range words {
+		eliminates := 0
+		count := 0
+		for _, possible := range possibleSolWords {
+			copySolMap := sols.Copy()
+			if guess == possible {
+				// forget about correct guesses...
+				continue
+			}
+			hypoCount := countCorrect(guess, possible)
+			addResult(guess, hypoCount, copySolMap, index, words)
+			hypospace := bitmapToSlice(words, copySolMap)
+			if len(hypospace) > 0 {
+				count = count + len(hypospace)
+				eliminates = eliminates + (len(possibleSolWords) - len(hypospace))
+			}
+		}
+		fmt.Println(guess, math.Abs(float64(eliminates-middle)), middle)
+		if math.Abs(float64(count-middle)) < math.Abs(bestelim-float64(middle)) {
+			bestelim = float64(count)
+			bestguess = guess
 		}
 	}
-
-	type kv struct {
-		Key   string
-		Value int
+	fmt.Println("Best guess is", bestguess, "elimates", bestelim, "on average")
+	for i := 0; i <= len(bestguess); i++ {
+		copySolMap := sols.Copy()
+		addResult(bestguess, i, copySolMap, index, words)
+		hypospace := bitmapToSlice(words, copySolMap)
+		fmt.Println("Correct:", i, "left", hypospace, len(hypospace))
 	}
+}
 
-	var ss []kv
-	for k, v := range m {
-		ss = append(ss, kv{k, v})
+func countCorrect(a, b string) int {
+	as := strings.Split(a, "")
+	bs := strings.Split(b, "")
+
+	sort.Strings(as)
+	sort.Strings(bs)
+
+	for i := 0; i < len(as); i++ {
+		if i > len(bs)-1 || as[i] != bs[i] {
+			return i
+		}
 	}
-
-	sort.Slice(ss, func(i, j int) bool {
-		return ss[i].Value > ss[j].Value
-	})
-
-	for _, kv := range ss {
-		fmt.Printf("%s, %d\n", kv.Key, kv.Value)
-	}
+	return 0
 }

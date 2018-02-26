@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"sort"
 	"strings"
@@ -45,6 +46,35 @@ func reverseIndex(words []string) map[string]*Bitmap {
 		}
 	}
 	return out
+}
+
+func indexCounts(m map[string]*Bitmap, words []string) {
+	countmap := map[string]int{}
+	for k, v := range m {
+		if len(k) != 4 {
+			continue
+		}
+		count := len(bitmapToSlice(words, v))
+		countmap[k] = count
+	}
+
+	type kv struct {
+		Key   string
+		Value int
+	}
+
+	var ss []kv
+	for k, v := range countmap {
+		ss = append(ss, kv{k, v})
+	}
+
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value > ss[j].Value
+	})
+
+	for _, kv := range ss {
+		fmt.Printf("%s, %s\n", kv.Key, bitmapToSlice(words, m[kv.Key]))
+	}
 }
 
 func bitmapToSlice(words []string, b *Bitmap) []string {
