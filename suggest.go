@@ -12,39 +12,33 @@ type hyposol struct {
 }
 
 func bestword(sols *Bitmap, words []string, index map[string]*Bitmap) {
-	possibleSolWords := bitmapToSlice(words, sols)
-	bestelim := float64(0)
+	middle := float64(len(bitmapToSlice(words, sols))) / 2
 	bestguess := ""
-	middle := len(possibleSolWords) * len(words) / 2
+	bestd := middle
 	for _, guess := range words {
-		eliminates := 0
-		count := 0
-		for _, possible := range possibleSolWords {
+		d := float64(0)
+		for i := 0; i <= len(guess); i++ {
 			copySolMap := sols.Copy()
-			if guess == possible {
-				// forget about correct guesses...
+			addResult(guess, i, copySolMap, index, words)
+			hypospace := bitmapToSlice(words, copySolMap)
+			n := len(hypospace)
+			if n == 0 {
 				continue
 			}
-			hypoCount := countCorrect(guess, possible)
-			addResult(guess, hypoCount, copySolMap, index, words)
-			hypospace := bitmapToSlice(words, copySolMap)
-			if len(hypospace) > 0 {
-				count = count + len(hypospace)
-				eliminates = eliminates + (len(possibleSolWords) - len(hypospace))
-			}
+			d = d + math.Abs(middle-float64(n))
 		}
-		fmt.Println(guess, math.Abs(float64(eliminates-middle)), middle)
-		if math.Abs(float64(count-middle)) < math.Abs(bestelim-float64(middle)) {
-			bestelim = float64(count)
+		if d < bestd {
 			bestguess = guess
+			bestd = d
 		}
 	}
-	fmt.Println("Best guess is", bestguess, "elimates", bestelim, "on average")
+	fmt.Println("best guess", bestguess, "d", bestd)
 	for i := 0; i <= len(bestguess); i++ {
 		copySolMap := sols.Copy()
 		addResult(bestguess, i, copySolMap, index, words)
 		hypospace := bitmapToSlice(words, copySolMap)
-		fmt.Println("Correct:", i, "left", hypospace, len(hypospace))
+		n := len(hypospace)
+		fmt.Println("correct", i, hypospace, n)
 	}
 }
 

@@ -33,6 +33,8 @@ func main() {
 		{"drew", 2},
 		{"ogre", 2},
 		{"quiz", 0},
+		{"abac", 1},
+		{"abid", 0},
 	}
 	sols := play(words, rounds...)
 	end := bitmapToSlice(words, sols)
