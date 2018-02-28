@@ -7,9 +7,8 @@ import (
 )
 
 func bestword(sols *Bitmap, words []string, index map[string]*Bitmap, blacklist []string) string {
-	middle := float64(len(bitmapToSlice(words, sols))) / 2
 	bestguess := ""
-	bestd := middle * 3
+	minBucket := float64(len(words))
 	var skip bool
 	for _, guess := range words {
 		for _, b := range blacklist {
@@ -22,7 +21,7 @@ func bestword(sols *Bitmap, words []string, index map[string]*Bitmap, blacklist 
 			skip = false
 			continue
 		}
-		d := float64(0)
+		maxBucket := float64(0)
 		for i := 0; i <= len(guess); i++ {
 			copySolMap := sols.Copy()
 			addResult(guess, i, copySolMap, index, words)
@@ -31,14 +30,14 @@ func bestword(sols *Bitmap, words []string, index map[string]*Bitmap, blacklist 
 			if n == 0 {
 				continue
 			}
-			d = d + math.Abs(middle-float64(n))
+			maxBucket = math.Max(float64(n), maxBucket)
 		}
-		if d < bestd {
+		if maxBucket < minBucket {
+			minBucket = maxBucket
 			bestguess = guess
-			bestd = d
 		}
 	}
-	fmt.Printf("The best guess is %s (d=%f)\n", bestguess, bestd)
+	fmt.Printf("The best guess is %s (d=%f)\n", bestguess, minBucket)
 	for i := 0; i <= len(bestguess); i++ {
 		copySolMap := sols.Copy()
 		addResult(bestguess, i, copySolMap, index, words)

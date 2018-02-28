@@ -22,6 +22,15 @@ func main() {
 	// {"jarl", 1},
 	// {"bind", 0},
 	// {"caph", 1},
+
+	// {"cede", 1},
+	// {"goji", 1},
+	// {"naps", 0},
+	// {"anon", 0},
+	// {"ands", 0},
+	// {"orzo", 0},
+	// {"daft", 0},
+	// {"alan", 1},
 	}
 	// rounds := []round{
 	// 	// {"dude", 0},
@@ -52,9 +61,7 @@ func main() {
 	blacklist := []string{}
 	sols := playRounds(words, rounds...)
 	m := reverseIndex(words)
-	if len(rounds) > 0 {
-		guess = bestword(sols, words, m, blacklist)
-	}
+	guess = bestword(sols, words, m, blacklist)
 	totalRounds := 0
 	for {
 		var word string
@@ -62,6 +69,10 @@ func main() {
 		fmt.Printf("===ROUND %d===\n", totalRounds)
 		fmt.Println("enter word")
 		fmt.Scanln(&word)
+		for word != "x" && len(word) != 4 {
+			fmt.Println("pick another")
+			fmt.Scanln(&word)
+		}
 		for word == "x" {
 			fmt.Println("removing", guess)
 			blacklist = append(blacklist, guess)
